@@ -116,21 +116,49 @@ if (isset($info['extension']) && !(isset($_GET['action']) && $_GET['action'] == 
 }
 
 if (isset($_GET['action'])) {
-    switch ($_GET['action']) {
-        case 'delete_file':
+  switch ($_GET['action']) {
+    case 'delete_file':
+        
+// patch prevent delete parent 
+        $minpath = str_replace("../source/".(substr($_SESSION["RF"]["subfolder"],0,-1)),"",$path);
+        $inpath = ($path != $minpath);
+        if (!$inpath || $minpath == "/" || $minpath == "") {
+          echo "Forbiden File";
+          die();
+        }
+// end patch        
 
-            deleteFile($path, $path_thumb, $config);
+        deleteFile($path, $path_thumb, $config);
 
-            break;
+        break;
 
-        case 'delete_files':
-            foreach ($paths as $key => $p) {
-                deleteFile($p, $paths_thumb[$key], $config);
-            }
+    case 'delete_files':
+        foreach ($paths as $key => $p) {
+
+// patch prevent delete parent 
+        $minpath = str_replace("../source/".(substr($_SESSION["RF"]["subfolder"],0,-1)),"",$p);
+        $inpath = ($p != $minpath);
+        if (!$inpath || $minpath == "/" || $minpath == "") {
+          echo "Forbiden Files";
+          die();
+        }
+// end patch
+          
+            deleteFile($p, $paths_thumb[$key], $config);
+        }
 
 			break;
 		case 'delete_folder':
 			if ($config['delete_folders']){
+        
+// patch prevent delete parent 
+        $minpath = str_replace("../source/".(substr($_SESSION["RF"]["subfolder"],0,-1)),"",$path);
+        $inpath = ($path != $minpath);
+        if (!$inpath || $minpath == "/" || $minpath == "") {
+          echo "Forbiden Folder";
+          die();
+        }
+// end patch        
 
 				if($ftp){
 					deleteDir($path,$ftp,$config);
